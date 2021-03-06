@@ -1,3 +1,7 @@
+%% EXPERIMENT CODE %%
+
+% This script will will run our behavioral experiment.
+
 %% Clean start
 clear; % clears all variables
 Screen('Preference', 'SkipSyncTests', 1); % Disables timing tests that we 
@@ -49,7 +53,7 @@ Screen('FillRect', mainwin, [0 0 0]);
 % set the size of the text
 Screen('TextSize', mainwin, 50);
 % write text to mainwin buffer
-DrawFormattedText(mainwin, ['placeholder instructions'], ...
+DrawFormattedText(mainwin, ['press spacebar'], ...
     'center', 'center', [255 255 255  ]);
 %Draw what is currently in mainwin buffer
 Screen('Flip', mainwin);
