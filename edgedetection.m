@@ -26,38 +26,56 @@
     % (?) functions that load in images, and save our output images? Or
     % just put this code in the main script?
   % pair coded this section for 2 hours  
-function framed = convolve(kernel, photo)
-    photo = photo(:,:,2); 
+function edgeMatrix = convolve(kernel, photo) %output = matrix of gradient magnitudes (dimensions same as photo)
+    photo = photo(:,:,1); 
     % im2bw(photo);
     photoSize = size(photo);
     kernelSize = size(kernel);
     kWidth = floor(kernelSize(2));
-    copyPhoto = zeros(photoSize);
+    horizEdge = zeros(photoSize); %copy matrix to fill in horizontal
+    
+    %output = horizontal convolution matrix (w/ photo dimensions)
+    for col = 1:size(photo, 2)
+        for row = 1:size(photo, 1)
+            sum1 = 0;
+            for k = 1:kWidth
+                if ~(row - kWidth/2 + k -1 < 0) && ~(row - kWidth/2 + k - 1 > size(photo, 1)) %if indice of kernel exists on photo (if doesn't leak off left side and doesn't leak over on right side.)
+                 %We originally put || up there ^^ but I think that's wrong so I changed it -Megan
+                    pix = photo(row - kWidth/2 + k -1, col); %value of photo pixel
+                    weight = kernel(k); %value of kenerl indice overlapping indice
+                    sum1 = sum1 + pix*weight;
+                end
+            end
+            horizEdge(row, col) = sum1;
+        end
+    end
+
+%Megan worked on vertEdge - 1.5 hours
+%output = vertical convolution matrix w/ photo's dimensions
+%didn't flip photo, instead flipped kernel
+    bigKernel = [1 0 -1; 2 0 -2; 1 0 -1];
+    kernel = bigKernel'(1, :);
+    kWidth = floor(size(kernel, 2));
+    vertEdge = zeros(size(photo)); %copy matrix to fill in
     
     for col = 1:size(photo, 2)
         for row = 1:size(photo, 1)
-            sum = 0;
+            sum2 = 0;
             for k = 1:kWidth
                 if ~ (row - kWidth/2 + k -1 < 0) || ~(row - kWidth/2 + k - 1 > photoSize(1)) 
-                    pix = photo(row - kWidth/2 + k -1, col);
-                    weight = kernel(k);
-                    sum = sum + pix*weight;
+                    pix = photo(row - kWidth/2 + k -1, col); %value of photo pixel
+                    weight = kernel(k); %value of kernel indice overlapping pix
+                    sum2 = sum2 + pix*weight; %running sum of product of surrounding kernel and pixel values
                 end
-                    
-                    
-                
-            % (row, col) is current pixel
-%             sample_code = photo(row : row + size(QR_code, 1)-1, col : col + size(QR_code, 2)-1);
-%             if(isequal(sample_code, QR_code))
-%                 detected = true;
-%             elseif(isequal(sample_code, rot90(QR_code)))
-%                 detected = true;
-%             end
             end
-            copyPhoto(row, col) = sum;
+            vertEdge(row, col) = sum2*bigKernel'(:, 1); %based off wiki, need to check horizEdge after consulting group -M
         end
     end
+    
+    %Megan-combined edgeMatrix/gradient magnitude
+    edgeMatrix = (horizEdge.^2 + vertEdge.^2).^0.5; %need to change vertEdge dimensions at some point before now    
 end
+
 
      
 %% Notes (should be deleted later)
@@ -67,6 +85,10 @@ end
 
 % x_kernel = [-1, 0, 1; -2, 0, 2; -1, 0, 1];
 % y_kernel = [-1, -2, -1; 0, 0, 0; 1, 2, 1];
+
+%What M found on Wikipedia: https://en.wikipedia.org/wiki/Sobel_operator
+   %x_kernel = [1 2 1]'*([1 0 -1]*photo)
+   %y_kernel = [1 0 -1]'*([1 2 1]*photo) I'm having trouble finding 1D operations
 
 % Convolution is preformed by centering a small matrix, called a kernel,
 % over each "pixel" in an image matrix, and using the values of the kernel
@@ -99,3 +121,35 @@ end
 %     disp(framed(kWidth/2 + 1, 20:25));
 %     disp(photo(1,20-kWidth/2:25-kWidth/2));
 %     imwrite(framed, "images/result.jpeg");
+
+%From QR_code assignment:
+            % (row, col) is current pixel
+%             sample_code = photo(row : row + size(QR_code, 1)-1, col : col + size(QR_code, 2)-1);
+%             if(isequal(sample_code, QR_code))
+%                 detected = true;
+%             elseif(isequal(sample_code, rot90(QR_code)))
+%                 detected = true;
+%             end
+
+
+% Original vertEdge
+% %Megan worked on vertEdge
+% %output = vertical convolution matrix w/ photo's dimensions
+%     photo = photo(:,:,1);
+%     photoFlipped = photo'; %photo matrix flipped
+%     kWidth = floor(size(kernel, 2));
+%     vertEdge = zeros(size(photoFlipped)); %copy matrix to fill in
+%     
+%     for col = 1:size(photoFlipped, 2)
+%         for row = 1:size(photoFlipped, 1)
+%             sum2 = 0;
+%             for k = 1:kWidth
+%                 if ~ (row - kWidth/2 + k -1 < 0) || ~(row - kWidth/2 + k - 1 > photoSize(1)) 
+%                     pix = photoFlipped(row - kWidth/2 + k -1, col); %value of photo pixel
+%                     weight = kernel(k); %value of kernel indice overlapping pix
+%                     sum2 = sum2 + pix*weight; %running sum of product of surrounding kernel and pixel values
+%                 end
+%             end
+%             vertEdge(row, col) = sum2*[1; 2; 1]; %based off wiki, need to check vertEdge after consulting group -M
+%         end
+%     end
