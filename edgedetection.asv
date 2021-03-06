@@ -24,7 +24,7 @@
     % just put this code in the main script?
     
 function framed = convolve(kernel, photo)
-    photo = im2bw(photo);
+    photo = 
     photoSize = size(photo);
     kernelSize = size(kernel);
     kWidth = floor(kernelSize(2));
