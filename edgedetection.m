@@ -32,13 +32,6 @@ function framed = convolve(kernel, photo)
     photoSize = size(photo);
     kernelSize = size(kernel);
     kWidth = floor(kernelSize(2));
-    %imwrite(photo);
-%     framed = zeros(photoSize(1) + kWidth -1, photoSize(2) + kWidth -1);
-%     framed(kWidth/2:end-kWidth/2, kWidth/2:end-kWidth/2) = photo;
-%     disp(framed(kWidth/2 + 1, 20:25));
-%     disp(photo(1,20-kWidth/2:25-kWidth/2));
-%     imwrite(framed, "images/result.jpeg");
-
     copyPhoto = zeros(photoSize);
     
     for col = 1:size(photo, 2)
@@ -97,3 +90,12 @@ end
 % how to create the grain with computer program
 % demo video??
 
+
+
+%Framing the photo (didn't work)
+    %imwrite(photo);
+%     framed = zeros(photoSize(1) + kWidth -1, photoSize(2) + kWidth -1);
+%     framed(kWidth/2:end-kWidth/2, kWidth/2:end-kWidth/2) = photo;
+%     disp(framed(kWidth/2 + 1, 20:25));
+%     disp(photo(1,20-kWidth/2:25-kWidth/2));
+%     imwrite(framed, "images/result.jpeg");
