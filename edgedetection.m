@@ -9,6 +9,13 @@
     
 %% Main script
     % preforms the operations
+    fileVec = ["tserre" "sloth"];
+    for ii = 1:length(fileVec)
+        image = imread(strcat("images/",fileVec(ii),".jpg"));
+        imageDetected = convolve(zeros(10,10),image);
+        imwrite(imageDetected,strcat("images/",fileVec(ii),"Detected",".jpg"));
+    end
+        
     img = imread("images/sloth.jpg");
     %imshow(img);
     %img = imread("images/tserre.jpg");
@@ -101,6 +108,8 @@ function edgeMatrix = convolve(kernel, photo) %output = matrix of gradient magni
             vertEdge2(row, col) = sum2;
         end
     end
+    edgeMatrix = vertEdge2;
+    
     %imshow(vertEdge2);
     
     %combine Verticals
