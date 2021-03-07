@@ -9,9 +9,11 @@
     
 %% Main script
     % preforms the operations
+    img = imread("images/sloth.jpg");
+    %imshow(img);
     %img = imread("images/tserre.jpg");
     %convolve(zeros(10,10), img);
-    img = ones(100) * 255/2;
+    %img = ones(100) * 255/2;
     convolve(zeros(10,10), img);
     
     
@@ -27,53 +29,87 @@
     % just put this code in the main script?
   % pair coded this section for 2 hours  
 function edgeMatrix = convolve(kernel, photo) %output = matrix of gradient magnitudes (dimensions same as photo)
-    photo = photo(:,:,1); 
+    photo = photo(:,:,1);
+    %imshow(photo);
     % im2bw(photo);
     photoSize = size(photo);
     kernelSize = size(kernel);
     kWidth = floor(kernelSize(2));
     horizEdge = zeros(photoSize); %copy matrix to fill in horizontal
     
-    %output = horizontal convolution matrix (w/ photo dimensions)
-    for col = 1:size(photo, 2)
-        for row = 1:size(photo, 1)
-            sum1 = 0;
-            for k = 1:kWidth
-                if ~(row - kWidth/2 + k -1 < 0) && ~(row - kWidth/2 + k - 1 > size(photo, 1)) %if indice of kernel exists on photo (if doesn't leak off left side and doesn't leak over on right side.)
-                 %We originally put || up there ^^ but I think that's wrong so I changed it -Megan
-                    pix = photo(row - kWidth/2 + k -1, col); %value of photo pixel
-                    weight = kernel(k); %value of kenerl indice overlapping indice
-                    sum1 = sum1 + pix*weight;
-                end
-            end
-            horizEdge(row, col) = sum1;
-        end
-    end
+%     %output = horizontal convolution matrix (w/ photo dimensions)
+%     for col = 1:size(photo, 2)
+%         for row = 1:size(photo, 1)
+%             sum1 = 0;
+%             for k = 1:kWidth
+%                 if ~(row - kWidth/2 + k -1 < 1) && ~(row - kWidth/2 + k - 1 > size(photo, 1))
+%                     pix = photo(row - kWidth/2 + k -1, col); %value of photo pixel
+%                     weight = kernel(k); %value of kenerl indice overlapping indice
+%                     sum1 = sum1 + pix*weight;
+%                 end
+%             end
+%             horizEdge(row, col) = sum1;
+%         end
+%     end
 
 %Megan worked on vertEdge - 1.5 hours
 %output = vertical convolution matrix w/ photo's dimensions
 %didn't flip photo, instead flipped kernel
-    bigKernel = [1 0 -1; 2 0 -2; 1 0 -1];
-    kernel = bigKernel'(1, :);
+
+%Vertical non-flipped
+    kernel = [1 2 1];
     kWidth = floor(size(kernel, 2));
-    vertEdge = zeros(size(photo)); %copy matrix to fill in
-    
+    half_kWidth = floor(kWidth/2);
+    vertEdge1 = zeros(size(photo)); %copy matrix to fill in
+    %imshow(photo);
     for col = 1:size(photo, 2)
         for row = 1:size(photo, 1)
             sum2 = 0;
             for k = 1:kWidth
-                if ~ (row - kWidth/2 + k -1 < 0) || ~(row - kWidth/2 + k - 1 > photoSize(1)) 
-                    pix = photo(row - kWidth/2 + k -1, col); %value of photo pixel
+                if ~ (row - half_kWidth +1 + k -1 < 1) && ~(row - half_kWidth +1 + k - 1 > photoSize(1))
+                    pix = photo(row - half_kWidth+1 + k -1, col); %value of photo pixel
                     weight = kernel(k); %value of kernel indice overlapping pix
-                    sum2 = sum2 + pix*weight; %running sum of product of surrounding kernel and pixel values
+                    sum2 = sum2 + (pix)*weight; %running sum of product of surrounding kernel and pixel values
+                %disp(pix);
                 end
             end
-            vertEdge(row, col) = sum2*bigKernel'(:, 1); %based off wiki, need to check horizEdge after consulting group -M
+            vertEdge1(row, col) = sum2;
+            %disp(sum2);
         end
     end
+    vertEdge1 = vertEdge1;
+    %imshow(vertEdge1);
+
+    %Vertical flipped
+    photo = vertEdge1;
+    kernel = [1 0 -1];
+    kWidth = floor(size(kernel, 2));
+    half_kWidth = floor(kWidth/2);
+    vertEdge2 = zeros(size(photo)); %copy matrix to fill in
+    horizEdge1 = zeros(size(photo));
+        
+    for col = 1:size(photo, 2)
+        for row = 1:size(photo, 1)
+            sum2 = 0;
+            for k = 1:kWidth
+                if ~ (row - half_kWidth +1 + k -1 < 1) && ~(row - half_kWidth+1 + k - 1 > photoSize(1))
+                    pix = photo(row - half_kWidth+1 + k -1, col); %value of photo pixel
+                    weight = kernel(k); %value of kernel indice overlapping pix
+                    sum2 = sum2 + (pix)*weight; %running sum of product of surrounding kernel and pixel values
+                end
+            end
+            vertEdge2(row, col) = sum2;
+        end
+    end
+    %imshow(vertEdge2);
+    
+    %combine Verticals
+    %edgeMatrix = (vertEdge1.^2 + vertEdge2.^2).^0.5;
+    %imshow(edgeMatrix);
+    
     
     %Megan-combined edgeMatrix/gradient magnitude
-    edgeMatrix = (horizEdge.^2 + vertEdge.^2).^0.5; %need to change vertEdge dimensions at some point before now    
+    %edgeMatrix = (horizEdge.^2 + vertEdge.^2).^0.5; %need to change vertEdge dimensions at some point before now    
 end
 
 function colorEdge = convolveColor(kernel, photo)
