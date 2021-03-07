@@ -76,6 +76,21 @@ function edgeMatrix = convolve(kernel, photo) %output = matrix of gradient magni
     edgeMatrix = (horizEdge.^2 + vertEdge.^2).^0.5; %need to change vertEdge dimensions at some point before now    
 end
 
+function colorEdge = convolveColor(kernel, photo)
+%for loop color channel 1
+    %output = redgradientmag
+
+%for loop for color channel 2
+    %output = greengradientmag
+
+%for loop for color channel 3
+    %output = bluegradientmag
+    
+%if red || green || blue > threshold, then there's an edge
+
+%hypothesis: as color hex codes get closer, more difficult for humn eye to discern difference but computer is able to.
+end
+
 
      
 %% Notes (should be deleted later)
