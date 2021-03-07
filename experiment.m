@@ -18,8 +18,8 @@ KbName('UnifyKeyNames'); % Cross-platform compatibility
 enter = KbName('Return');
 left = KbName('LeftArrow'); right = KbName('RightArrow');
 
-% These will be "utility" keys
-spaceKey = KbName('space'); escKey = KbName('ESCAPE');
+% these will be for utilities 
+spaceKey = KbName('space'); escKey = KbName('ESCAPE'); 
 
 %%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -45,6 +45,7 @@ Screen(mainwin, 'Flip'); % Show what has been drawn so far in mainwin
 % drawings we make until we are ready to show them.
 
 HideCursor; % hides the users cursor
+ListenChar(2) % stops keyboard interaction with command window
 
 % show experiment instructions
 
@@ -75,32 +76,42 @@ while 1
     end
 end
 
-% Draw a new black rectangle on the mainwin buffer
-Screen('FillRect', mainwin, [0 0 0]);
-% add stimulus drawing to mainwin buffer
-drawStimulus(mainwin, center, "images/tserre.jpg");
-% draw mainwin buffer
-Screen(mainwin, 'Flip'); % draw whats in the mainwin buffer
-
 %main trial loop
 keyIsDown = 0;
+offset = 0;
 
 % start infinite loop to wait for keypresses
     % if user presses the space bar, save data and advance trial
     % if user presses the escape key, close window and end experiment
 while 1
     [keyIsDown, secs, keyCode] = KbCheck;
+    FlushEvents('keyDown');
     if keyIsDown
-        if keyCode(spaceKey)
+        if keyCode(right)
+            offset = min(offset + 1, 500);
+        elseif keyCode(left)
+            offset = max(offset - 1, 0);
+        elseif keyCode(spaceKey)
             % advance trial 
         elseif keyCode(escKey)
             ShowCursor;
+            ListenChar(0); % returns keyboard to command window
             Screen('CloseAll');
             return;
         end
+    else
+        % Draw a new black rectangle on the mainwin buffer
+        Screen('FillRect', mainwin, [0 0 0]);
+        % add stimulus drawing to mainwin buffer
+        drawStimulus(mainwin, center, "images/tserre.jpg");
+        drawProbe(mainwin, center, 1, [1], offset);
+        DrawFormattedText(mainwin, [int2str(offset)], ...
+            100, 100, [255 255 255]);
+        % draw mainwin buffer
+        Screen(mainwin, 'Flip'); % draw whats in the mainwin buffer
     end
+    keyIsDown = 0; keyCode = 0;
 end
-
 
 %% Draw Functions
 % functions we write that draw stuff we need. These will be called in the 
@@ -121,6 +132,25 @@ function drawStimulus(mainwin, center, currStimPath)
         center(1)+imgsize(2)/2 center(2)+imgsize(2)/2];
     Screen('DrawTexture', mainwin, tex, [0 0 imgsize(2) imgsize(1)],...
         dest_rec);
+end
+
+function drawProbe(mainwin, center, condition, probe_points, offset)
+    %%% draw scan line %%%
+    % make switch case based on condition
+    % for now default value
+    xTop = center(1)-250;
+    xBot = center(1)+250;
+    yTop = center(2)-7; 
+    yBot = center(2)+7;
+    
+    % draws outline of rectangle
+    Screen('FrameRect', mainwin, [255 0 0], [xTop yTop xBot yBot], 3);
+    
+    % draw prob points
+    for p = probe_points(:)
+        Screen('DrawLine', mainwin, [255 0 0], ...
+            xTop + offset, yTop, xTop + offset, yBot, 3)
+    end
 end
 
 
