@@ -9,7 +9,7 @@
     
 %% Main script
     % preforms the operations
-    fileVec = ["tserre", "sloth"];
+    fileVec = ["tserre"], "sloth"];
     for ii = 1:length(fileVec)
         image = imread(strcat("images/",fileVec(ii),".jpg"));
         %image = imgaussfilt(image, 2); % works well with the clip art
@@ -86,15 +86,13 @@ function edges = convolve1D(photo, kH, kV)
                     pix = result1(row, col - half_kWidth + k - 1);
                     % grabs the weight from the kernel
                     weight = kV(k);
-                    % adds the weighted value to the accumulated new value
+                    % adds the weighted value to the 
                     sum = sum + pix * weight;
                 end
             end
-            % sets the corresponding pixel in result1 to the new value
             result2(row, col) = sum;
         end
     end
-    % sets the output to result2
     edges = result2;
 end
 

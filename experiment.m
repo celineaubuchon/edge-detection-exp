@@ -95,7 +95,7 @@ while 1
             % advance trial 
         elseif keyCode(escKey)
             ShowCursor;
-            ListenChar(0); % returns keyboard to command window
+            ListenChar(1); % returns keyboard to command window
             Screen('CloseAll');
             return;
         end
