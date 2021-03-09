@@ -8,27 +8,28 @@
     
     
 %% Main script
-    % preforms the operations
-    fileVec = ["tserre", "sloth"];
-    for ii = 1:length(fileVec)
-        image = imread(strcat("images/",fileVec(ii),".jpg"));
-        %image = imgaussfilt(image, 2); % works well with the clip art
-        imageDetected = convolve1D(image/255.0, [1 2 1], [1 0 -1]);
-        imageDetected2 = rot90(convolve1D(rot90(image/255.0), [1 2 1], [1 0 -1]), 3);
-        combined = (imageDetected.^2 + imageDetected2.^2).^0.5 * 255.0;
-        %imshow(combined);
-        imwrite(combined,strcat("images/",fileVec(ii),"Detected",".jpg"));
-    end
-        
-    img = imread("images/sloth.jpg");
-    %imshow(img);
-    %img = imread("images/tserre.jpg");
-    %convolve(zeros(10,10), img);
-    %img = ones(100) * 255/2;
-    convolve(zeros(10,10), img);
-    
-    
 
+    % preforms the operations
+    fileVec = ["tserre"];
+    
+    for ii = 1:length(fileVec)
+        % read in the image file
+        image = imread(strcat("images/",fileVec(ii),".jpg"));
+        % convert to grayscale, and convert value range to (0, 1)
+        image = im2gray(image)/255.0;
+        % detect horizontal edges
+        imageHoriz= convolve1D(image, [1 2 1], [1 0 -1]);
+        % detect veritcal edges
+        imageVert = rot90(convolve1D(rot90(image), [1 2 1], [1 0 -1]), 3);
+        %combine the horizontal and the vertical, sens is 
+        sens = 0.6;
+        combined = (imageHoriz.^2 + imageVert.^2).^0.5 .* sens;
+        %threshold
+        combined(combined > 1) = 1;
+        imshow(combined == 1);
+        
+        imwrite(combined == 1,strcat("images/",fileVec(ii),"Detected",".jpg"));
+    end
 %% Functions
     % functions we will write to be called in main script
     
@@ -40,8 +41,6 @@ function edges = convolve1D(photo, kH, kV)
     % output: edges, a matrix with the same size as photo representing the
     % output of the convolution
     
-    
-    photo = photo(:, :, 1); % temporary, grabs one channel of the photo
     photoSize = size(photo); % gets photo size
     kWidth = length(kH); % gets the width of the kernel
     half_kWidth = floor(kWidth/2); % half of kWidth, rounded down 
