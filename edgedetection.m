@@ -10,7 +10,7 @@
 %% Main script
 
     % preforms the operations
-    fileVec = ["tserre"];
+    fileVec = ["sloth"];
     
     for ii = 1:length(fileVec)
         % read in the image file
@@ -23,10 +23,11 @@
         imageVert = rot90(convolve1D(rot90(image), [1 2 1], [1 0 -1]), 3);
         %combine the horizontal and the vertical, sens is 
         sens = 0.6;
-        combined = (imageHoriz.^2 + imageVert.^2).^0.5 .* sens;
+        combined = (imageHoriz.^2 + imageVert.^2).^0.5;
         %threshold
-        combined(combined > 1) = 1;
-        imshow(combined == 1);
+        %combined(combined > 1) = 1;
+        disp(max(max(combined)));
+        imshow(combined > 3.8);
         
         imwrite(combined == 1,strcat("images/",fileVec(ii),"Detected",".jpg"));
     end
