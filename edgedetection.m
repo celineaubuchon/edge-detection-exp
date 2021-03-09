@@ -325,7 +325,7 @@ end
 %         end
 %     end
 
-%Analysis: graphs -- Catherine
+%Analysis: graphs -- Catherine 
 % graphs to show the success of human trials and the computer in finding the edges of the images. 
 % separate graphs first. for the computer for each image graph the
 % difference between the actual edge and the detected edge. for the humans
