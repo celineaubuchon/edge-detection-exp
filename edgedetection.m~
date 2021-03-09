@@ -338,8 +338,6 @@ end
 % points of the edge and teh points they map in a line graph
 % the edges can be mapped by the correct pixels and the colvolved edges and
 % the difference between then
-% a series of line graphs w legends on teh one that shows both humans and
-% machines
-% will that work to map the differences?
+%
 %
 
