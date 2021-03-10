@@ -2,66 +2,51 @@
 %% Pulling Human Data
 datafile = fopen('data/junk.txt', 'r');
 A = fscanf(datafile, '%s %i %s %s');
-A
+
 %probe_array
 %% Pulling data
 computerData = imread('images/slothDetected.jpg');
  
 originalImage = imread('images/sloth.jpg');
-%originalImage = zeros(500,500,3);
-%originalImage(250,:,:) = ones(1,500,3);
 
 
 %pull the human data for this image
-%% Creating graphs
-%index to (250,:)row 250 by all the columns
-%index by computer data and whichever pixels equal 1 we color red and index
-%and show that row (for both humans and computer)
-%first for the computer data 
+%% Creating figures
+%takes in the original images and images from the experiment and overlays with red where edge detection program detected edges
  
-%computerData(250,:)
- 
-%originalImage(250,:)
-%matrix = zeros(size(computerData));
- 
-computerData(computerData > 200) = 255;
+computerData(computerData > 200) = 255; %capture values that are almost white to decrease noise when pixels turn red
  
  
-computerData = repmat(computerData,[1,1,3]);
+computerData = repmat(computerData,[1,1,3]); %turn computerData from black and white to color image
  
  
-redChannel = computerData(:,:,1);
+%separate color channels in computerData
+redChannel = computerData(:,:,1); 
 greenChannel = computerData(:,:,2);
 blueChannel = computerData(:,:,3);
  
+%white pixels
 whitepixels= redChannel == 255 & greenChannel == 255 & blueChannel == 255;
-%whitepixels = logical(computerData == 1);
     
- 
+%turn white pixels red
 redChannel(whitepixels)=255;
 greenChannel(whitepixels)=0;
 blueChannel(whitepixels)=0;
  
+%recombine color channels
 computerData = cat(3, redChannel, greenChannel, blueChannel);
  
+%separate color channels in originalImage
 redChannelOrig = originalImage(:,:,1);
 greenChannelOrig = originalImage(:,:,2);
 blueChannelOrig = originalImage(:,:,3);
  
+%turn white pixels red
 redChannelOrig(whitepixels)=255;
 greenChannelOrig(whitepixels)=0;
 blueChannelOrig(whitepixels)=0;
 originalImage = cat(3, redChannelOrig, greenChannelOrig, blueChannelOrig);
  
+%display images with red where edge detection program detected edges
 imshow(computerData);
 imshow(originalImage);
- 
-% computerData = cat(3, computerData, computerData, computerData);
-% computerData = computerData/255;
-% computerData(250,computerData==1) = 255;
-% imshow(computerData);
- 
-%disp(size(originalImage));
-%disp(size(computerData));
-%disp(computerData(:,:,3));
-%disp(max(max(computerData)));
