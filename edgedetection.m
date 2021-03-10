@@ -11,10 +11,15 @@
 
     % preforms the operations
     fileVec = ["sloth"];
-    
+    x_data = [0:0.01:0.5];
+    y_data = zeros(length(x_data));
     for ii = 1:length(fileVec)
+        for jj = 0:0.01:0.5
         % read in the image file
         image = imread(strcat("images/",fileVec(ii),".jpg"));
+        image = imnoise(image, 'gaussian', jj);
+        oimage = image; %copy of original image for printing display
+        %imshow(image2);
         % convert to grayscale, and convert value range to (0, 1)
         image = im2gray(image)/255.0;
         % detect horizontal edges
@@ -26,10 +31,26 @@
         combined = (imageHoriz.^2 + imageVert.^2).^0.5;
         %threshold
         %combined(combined > 1) = 1;
-        disp(max(max(combined)));
-        imshow(combined > 3.8);
+          disp(max(max(combined)));
+          
+          %changing graph
+          y_data(floor(jj*100)+1) = max(max(combined)); %y-data array of combined
+          figure(1);hold all
+           subplot(1, 3, 1);%line graph
+           plot(x_data, y_data);drawnow
+           ylim([4.465, 4.48]);drawnow
+           %xlim([-0.00001, jj]);drawnow
+           xlabel('Guassian Blur');
+           ylabel('Edge Detection Magnitude');
+           title('Edge Detection as Image Noise Increases');
+           pause(0.01);
+         subplot(1, 3, 2); imshow(combined > 3.8); %edge detection image
+         subplot(1, 3, 3); imshow(oimage); %original image with increasing noise
+
+%disp(floor(jj*100)+1);
         
-        imwrite(combined == 1,strcat("images/",fileVec(ii),"Detected",".jpg"));
+        imwrite(combined == 1,strcat("images/",fileVec(ii),"DetectedBlur",num2str(jj),".jpg"));
+        end
     end
 %% Functions
     % functions we will write to be called in main script
