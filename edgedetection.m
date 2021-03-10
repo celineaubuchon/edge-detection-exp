@@ -356,11 +356,10 @@ end
 % the humans & the correct edge and the edge detected by the computer and
 % the correct edge
 % the human edges are detected by mapping points, can compare the correct
-% points of the edge and teh points they map in a line graph
+% points of the edge and teh points they map 
 % the edges can be mapped by the correct pixels and the colvolved edges and
 % the difference between then
-% a series of line graphs w legends on teh one that shows both humans and
-% machines
+%
 % will that work to map the differences?
 %
 
