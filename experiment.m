@@ -28,36 +28,35 @@ prompt = {'Subject Initials'};
 default = {'junk'};
 
 answer = inputdlg(prompt, 'Experiment', 1, default);
-subj = answer{1};
+subinit = answer{1};
 
-% create filepath name for subject's data file
-outputfilename = strcat('data\', subj, '.txt');
+outputfilename = strcat('data\', subinit, '.txt');
 
-% open the data file to write to
+if ~exist('data', 'dir')
+    disp('made directory');
+    mkdir('data');
+end
+
 datafile = fopen(outputfilename, 'wt');
-
-% print the column titles to the data file
 fprintf(datafile, 'subj\t trial\t stim\t probearray\t\n');
 
 %% Conditions
 % set up the conditional variables
     % repetitions
-    % stim: each image
+    % stim: each image, and each image rotated 90 
     % scan line: 1 2
 
-reps = 3; % number of repetitions per image
-stimuli = ["tserre.jpg", "sloth.jpg"]; % image names
+reps = 2; 
+stimuli = ["tserre.jpg", "sloth.jpg"];
 
-stim_count = length(stimuli); % number of images
 
-totalTrials = reps * stim_count; % total number of trials
+stim_count = length(stimuli);
+
+totalTrials = reps * stim_count;
 
 % create random trial order
-stim_order = zeros(1, totalTrials); % array of zeros to be populated with 
-%the random image order
+stim_order = zeros(1, totalTrials);
 
-% populate stim order with the number of images that will be display, with
-% repetitions
 i = 1;
 for r = 1:reps
     for stm = 1:stim_count
@@ -66,8 +65,8 @@ for r = 1:reps
     end
 end
 
-% randomly re-order stim_order to create a random trial order
-stim_order = stim_order(randperm(length(stim_order)));
+disp(stim_order);
+
 
 %% Window Setup
 % gets a buffer for the window, mainwin, and the screen dimensions,
@@ -107,12 +106,11 @@ Screen('Flip', mainwin);
     % the experiment
     % if user presses the escape key, close window and end experiment
 while 1
-    [keyIsDown, secs, keyCode] = KbCheck; % checks keyboard activity
-    if keyIsDown % if a key is pressed
-        if keyCode(spaceKey) % check if its the space key
-            KbReleaseWait; % wait for a key to be released to continue the loop
-            break; % if so, break out of the loop and continue
-        elseif keyCode(escKey) % if the key is esc, close program
+    [keyIsDown, secs, keyCode] = KbCheck;
+    if keyIsDown
+        if keyCode(spaceKey)
+            break;
+        elseif keyCode(escKey)
             fclose(datafile);
             ShowCursor;
             Screen('CloseAll');
@@ -121,70 +119,67 @@ while 1
     end
 end
 
-% MAIN TRIAL LOOP
+%main trial loop
 
-% initialize some variables
-keyIsDown = 0; % bool representing if a key is pressed
-offset = 0; % num of pixels from left edge that the probe has been moved
+keyIsDown = 0;
+offset = 0;
 
-probe_points = []; % empty array to store the probe point x coordinates
-moving_probe = false; % boolean indicating if a probe is being adjusted
+probe_points = [];
+moving_probe = false;
 
-trial = 1; % trial number, this is the first trial so trial = 1
-stim = stim_order(trial); % get the current stim by indexing stim_order
-% by trial
+trial = 1;
+stim = stimuli(stim_order(trial));
 
 % start infinite loop to wait for keypresses
     % if user presses the space bar, save data and advance trial
     % if user presses enter, set probe point
     % if user presses the escape key, close window and end experiment
-    % if user presses right or left, move probe point
-    
 while 1
-    [keyIsDown, secs, keyCode] = KbCheck; % check for keyboard activity
-    FlushEvents('keyDown'); % clear queue of keypresses
-    if keyIsDown % if a key is pressed
-        if keyCode(right) % if the key is right
-            offset = min(offset + 5, 500); % add to the offset
-            if moving_probe % if there is a probe to be adjusted
-                probe_points(end) = floor(offset); % update probe value in array
-            else % if there is no current probe
-                moving_probe = true; % set moving_probe to true
-                probe_points(end + 1) = offset; % add a probe to the array
+    [keyIsDown, secs, keyCode] = KbCheck;
+    FlushEvents('keyDown');
+    if keyIsDown
+        if keyCode(right)
+            offset = min(offset + 5, 500);
+            if moving_probe
+                probe_points(end) = floor(offset);
+            else
+                moving_probe = true;
+                probe_points(end + 1) = offset;
             end
-        elseif keyCode(left)% if the key is left
-            offset = max(offset - 5, 0); % substract from offset
-            probe_points(end) = floor(offset); % update the recent probe in the array
-        elseif keyCode(enter) % if the key is enter
-            moving_probe = false; % set the current probe's position
-        elseif keyCode(spaceKey) % if the key is space
-            writeSubjData(datafile, subj, trial, stimuli(stim), probe_points);
-            offset = 0; % reset the offset value for a new trial
-            probe_points = []; % reset probe points array for new trial
-            if trial < totalTrials % if it wasn't the last trial
-                trial = trial + 1; % set trial to next trial
-                stim = stim_order(trial); % get new stim index
-            else % if all trials were completed
-                endExperiment(mainwin, datafile); % end the experiment
-                Screen('CloseAll'); % close all screens
+        elseif keyCode(left)
+            offset = max(offset - 5, 0);
+            probe_points(end) = floor(offset);
+        elseif keyCode(enter)
+            moving_probe = false;
+        elseif keyCode(spaceKey)
+            offset = 0;
+            probe_points = [];
+            if trial < totalTrials
+                % write the data to the file
+                trial = trial + 1;
+                stim = stim_order(trial);
+            else
+                endExperiment(mainwin, datafile);
+                Screen('CloseAll');
                 return;
             end
             
-        elseif keyCode(escKey) % if the key was escape
-            fclose(datafile); % close the data file
-            ShowCursor; % show the cursor
+        elseif keyCode(escKey)
+            fclose(datafile);
+            ShowCursor;
             ListenChar(1); % returns keyboard to command window
-            Screen('CloseAll'); % close all screens
+            Screen('CloseAll');
             return;
         end
-        KbReleaseWait; % wait for a key to be released to continue the loop
-    else % if a key wasn't pressed
+        KbReleaseWait;
+    else
         % Draw a new black rectangle on the mainwin buffer
         Screen('FillRect', mainwin, [0 0 0]);
         % add stimulus drawing to mainwin buffer
         drawStimulus(mainwin, center, strcat("images/", stimuli(stim)));
-        % add probe drawing to mainwin buffer
         drawProbe(mainwin, center, probe_points);
+        DrawFormattedText(mainwin, [int2str(offset)], ...
+            100, 100, [255 255 255]);
         % draw mainwin buffer
         Screen(mainwin, 'Flip'); % draw whats in the mainwin buffer
     end
@@ -245,12 +240,6 @@ function endExperiment(mainwin, datafile)
     pause(3);
 end
 
-function writeSubjData(datafile, initials, trial, stim, probePoints)
-    count = length(probePoints);
-    arraySpec = repmat(' %i', 1, count);
-    fprintf(datafile, strcat('%s %i %s', arraySpec,'\n'),...
-        initials, trial, stim, probePoints);
-end
 
 
 
