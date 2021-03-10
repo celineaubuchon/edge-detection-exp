@@ -1,1 +1,4 @@
 subj	 trial	 stim	 probearray	
+junk 1 tserre.jpg 25 50 70
+junk 2 sloth.jpg 20 50 70
+junk 3 tserre.jpg 20 30

@@ -10,11 +10,11 @@
 %% Main script
 
     % preforms the operations
-    fileVec = ["sloth"];
+    fileVec = ["Matlab_logo copy"];
     
     for ii = 1:length(fileVec)
         % read in the image file
-        image = imread(strcat("images/",fileVec(ii),".jpg"));
+        image = imread(strcat("images/",fileVec(ii),".png"));
         % convert to grayscale, and convert value range to (0, 1)
         image = im2gray(image)/255.0;
         % detect horizontal edges
