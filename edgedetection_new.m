@@ -8,8 +8,10 @@
     
     
 %% Main script
-    % preforms the operations
-    fileVec = ["sloth"];
+    % performs the operations
+    fileVec = ["sloth", "tserre", "logo", ...
+        "sloth_blur1", "tserre_blur1", "logo_blur1",...
+        "sloth_blur2", "tserre_blur2", "logo_blur2"];
     for ii = 1:length(fileVec)
         image = imread(strcat("images/",fileVec(ii),".jpg"));
         image = im2gray(image)/255.0;
@@ -23,6 +25,26 @@
         imwrite(combined == 1,strcat("images/",fileVec(ii),"Detected",".jpg"));
     end
     
+<<<<<<< HEAD
+   photo = imread("images/sloth.jpg");
+    for q = 0:0.01:0.5 %increments of blur
+        image = imnoise(photo, 'gaussian', q);
+        
+        oimage = image; %copy of original image for printing display
+        image = im2gray(image)/255.0;
+        
+        %Computer Edge detection
+        imageDetected = convolve1D(image, [1 2 1], [1 0 -1]);
+        imageDetected2 = rot90(convolve1D(rot90(image), [1 2 1], [1 0 -1]), 3);
+        sens = 0.4;
+        combined = (imageDetected.^2 + imageDetected2.^2).^0.5 * sens;
+        combined(combined > 1) = 1;
+    
+        figure(1);hold all
+        subplot(1, 2, 1); imshow(oimage); title('Original Image'); %original image with increasing noise
+        subplot(1, 2, 2); imshow(combined == 1); title('Computer Sees'); %edge detection image
+    end
+=======
     blurTime("sloth");
     
     
@@ -48,6 +70,7 @@
 %         end
 %     end
 
+>>>>>>> 810fcc778ff7daee9171270f21a98baf2c84e05e
 
 %% Functions
     % functions we will write to be called in main script
@@ -118,6 +141,8 @@ function edges = convolve1D(photo, kH, kV)
     edges = result2;
 end
 
+<<<<<<< HEAD
+=======
 function funGif = blurTime(photo)
 for jj = 0:0.01:0.5 %increments of blur
 	image = imnoise(photo, 'gaussian', jj);
@@ -143,6 +168,7 @@ end
 
 
 
+>>>>>>> 810fcc778ff7daee9171270f21a98baf2c84e05e
      
 %% Notes (should be deleted later)
 
@@ -232,6 +258,3 @@ end
 % points of the edge and teh points they map in a line graph
 % the edges can be mapped by the correct pixels and the colvolved edges and
 % the difference between then
-%
-%
-
