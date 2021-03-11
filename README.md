@@ -10,7 +10,7 @@ Quick how-to-run:
 
 3)Watch how computer edge detection weakens as photo noise increases
 
-LINK GIF
+![gif](https://github.com/celineaubuchon/edge-detection-exp/blob/9b82aa70a1cfa236c94f3b6eba730070ca627eb2/edge_detection.gif)
 
 4)Go to experiment script
 
