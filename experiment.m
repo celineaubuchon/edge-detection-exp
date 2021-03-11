@@ -1,6 +1,30 @@
 %% EXPERIMENT CODE %%
 
 % This script will will run our behavioral experiment.
+%% Generate Images
+% to be used as stimuli
+tserre = imread("images/tserre.jpg");
+sloth = imread("images/sloth.jpg");
+logo = imread("images/Matlab_Logo copy.png");
+
+tserre_blur1 = imnoise(tserre, 'gaussian', 0.2);
+tserre_blur2 = imnoise(tserre, 'gaussian', 0.4);
+
+sloth_blur1 = imnoise(sloth, 'gaussian', 0.2);
+sloth_blur2 = imnoise(sloth, 'gaussian', 0.4);
+
+logo_blur1 = imnoise(logo, 'gaussian', 0.2);
+logo_blur2 = imnoise(logo, 'gaussian', 0.4);
+
+imwrite(tserre_blur1, "images/tserre_blur1.jpg");
+imwrite(tserre_blur2, "images/tserre_blur2.jpg");
+
+imwrite(sloth_blur1, "images/sloth_blur1.jpg");
+imwrite(sloth_blur2, "images/sloth_blur2.jpg");
+
+imwrite(logo, "images/logo.jpg");
+imwrite(logo_blur1, "images/logo_blur1.jpg");
+imwrite(logo_blur2, "images/logo_blur2.jpg");
 
 %% Clean start
 clear; % clears all variables
@@ -28,9 +52,9 @@ prompt = {'Subject Initials'};
 default = {'junk'};
 
 answer = inputdlg(prompt, 'Experiment', 1, default);
-subinit = answer{1};
+subj = answer{1};
 
-outputfilename = strcat('data\', subinit, '.txt');
+outputfilename = strcat('data\', subj, '.txt');
 
 if ~exist('data', 'dir')
     disp('made directory');
@@ -41,14 +65,16 @@ datafile = fopen(outputfilename, 'wt');
 fprintf(datafile, 'subj\t trial\t stim\t probearray\t\n');
 
 %% Conditions
+
 % set up the conditional variables
     % repetitions
     % stim: each image, and each image rotated 90 
     % scan line: 1 2
 
-reps = 2; 
-stimuli = ["tserre.jpg", "sloth.jpg"];
-
+reps = 1; 
+stimuli = ["tserre.jpg", "sloth.jpg", "logo.jpg", ... 
+    "tserre_blur1.jpg", "sloth_blur1.jpg", "logo_blur1.jpg",...
+    "tserre_blur2.jpg", "sloth_blur2.jpg", "logo_blur2.jpg"];
 
 stim_count = length(stimuli);
 
@@ -64,8 +90,6 @@ for r = 1:reps
         i = i + 1;
     end
 end
-
-disp(stim_order);
 
 
 %% Window Setup
@@ -109,6 +133,7 @@ while 1
     [keyIsDown, secs, keyCode] = KbCheck;
     if keyIsDown
         if keyCode(spaceKey)
+            KbReleaseWait;
             break;
         elseif keyCode(escKey)
             fclose(datafile);
@@ -128,7 +153,7 @@ probe_points = [];
 moving_probe = false;
 
 trial = 1;
-stim = stimuli(stim_order(trial));
+stim = stim_order(trial);
 
 % start infinite loop to wait for keypresses
     % if user presses the space bar, save data and advance trial
@@ -141,21 +166,25 @@ while 1
         if keyCode(right)
             offset = min(offset + 5, 500);
             if moving_probe
-                probe_points(end) = floor(offset);
+                sz = length(probe_points);
+                probe_points(sz) = floor(offset);
             else
                 moving_probe = true;
-                probe_points(end + 1) = offset;
+                probe_points = [probe_points, offset];
             end
         elseif keyCode(left)
-            offset = max(offset - 5, 0);
-            probe_points(end) = floor(offset);
+            if(moving_probe)
+                offset = max(offset - 5, 0);
+                sz = length(probe_points);
+                probe_points(sz) = floor(offset);
+            end
         elseif keyCode(enter)
             moving_probe = false;
         elseif keyCode(spaceKey)
+            writeSubjData(datafile, subj, trial, stimuli(stim), probe_points)
             offset = 0;
             probe_points = [];
             if trial < totalTrials
-                % write the data to the file
                 trial = trial + 1;
                 stim = stim_order(trial);
             else
@@ -178,8 +207,6 @@ while 1
         % add stimulus drawing to mainwin buffer
         drawStimulus(mainwin, center, strcat("images/", stimuli(stim)));
         drawProbe(mainwin, center, probe_points);
-        DrawFormattedText(mainwin, [int2str(offset)], ...
-            100, 100, [255 255 255]);
         % draw mainwin buffer
         Screen(mainwin, 'Flip'); % draw whats in the mainwin buffer
     end
@@ -238,6 +265,12 @@ function endExperiment(mainwin, datafile)
     ShowCursor;
     ListenChar(1);
     pause(3);
+end
+
+function writeSubjData(datafile, subj, trial, image, probe_points)
+    probe_string = repmat(' %i', 1, length(probe_points));
+    fprintf(datafile, strcat('%s %i %s', probe_string, '\n'),...
+        subj, trial, image, probe_points);
 end
 
 

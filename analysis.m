@@ -1,6 +1,6 @@
 %analysis of experiment
 %% Pulling Human Data
-datafile = fopen('data/junk.txt', 'r');
+datafile = fopen('data/ca1.txt', 'r');
 %A = fscanf(datafile, '%s %i %s %s', 4);
 %A
 
@@ -61,24 +61,69 @@ imshow(test);
 
 %% Pulling data
 computerData = imread('images/slothDetected.jpg');
- 
 originalImage = imread('images/sloth.jpg');
 
+blurTime("sloth");
 
-%pull the human data for this image
-%% Creating figures
-%takes in the original images and images from the experiment and overlays with red where edge detection program detected edges
- 
+% computerData = imread('images/slothDetected.jpg');
+%  
+% originalImage = imread('images/sloth.jpg');
+% 
+% 
+% %pull the human data for this image
+% %% Creating figures
+% %takes in the original images and images from the experiment and overlays with red where edge detection program detected edges
+%  
+% computerData(computerData > 200) = 255; %capture values that are almost white to decrease noise when pixels turn red
+%  
+%  
+% computerData = repmat(computerData,[1,1,3]); %turn computerData from black and white to color image
+%  
+%  
+% %separate color channels in computerData
+% redChannel = computerData(:,:,1); 
+% greenChannel = computerData(:,:,2);
+% blueChannel = computerData(:,:,3);
+%  
+% %white pixels
+% whitepixels= redChannel == 255 & greenChannel == 255 & blueChannel == 255;
+%     
+% %turn white pixels red
+% redChannel(whitepixels)=255;
+% greenChannel(whitepixels)=0;
+% blueChannel(whitepixels)=0;
+%  
+% %recombine color channels
+% computerData = cat(3, redChannel, greenChannel, blueChannel);
+%  
+% %separate color channels in originalImage
+% redChannelOrig = originalImage(:,:,1);
+% greenChannelOrig = originalImage(:,:,2);
+% blueChannelOrig = originalImage(:,:,3);
+%  
+% %turn white pixels red
+% redChannelOrig(whitepixels)=255;
+% greenChannelOrig(whitepixels)=0;
+% blueChannelOrig(whitepixels)=0;
+% originalImage = cat(3, redChannelOrig, greenChannelOrig, blueChannelOrig);
+%  
+% %display images with red where edge detection program detected edges
+% imshow(computerData);
+% imshow(originalImage);
+
+%% Functions
+function [compData, origImage] = overlayImage(computerData, originalImage)
 computerData(computerData > 200) = 255; %capture values that are almost white to decrease noise when pixels turn red
  
  
-computerData = repmat(computerData,[1,1,3]); %turn computerData from black and white to color image
+compData = repmat(computerData,[1,1,3]); %turn computerData from black and white to color image
+originalImage = repmat(originalImage,[1,1,3]);
  
  
 %separate color channels in computerData
-redChannel = computerData(:,:,1); 
-greenChannel = computerData(:,:,2);
-blueChannel = computerData(:,:,3);
+redChannel = compData(:,:,1); 
+greenChannel = compData(:,:,2);
+blueChannel = compData(:,:,3);
  
 %white pixels
 whitepixels= redChannel == 255 & greenChannel == 255 & blueChannel == 255;
@@ -89,7 +134,7 @@ greenChannel(whitepixels)=0;
 blueChannel(whitepixels)=0;
  
 %recombine color channels
-computerData = cat(3, redChannel, greenChannel, blueChannel);
+compData = cat(3, redChannel, greenChannel, blueChannel);
  
 %separate color channels in originalImage
 redChannelOrig = originalImage(:,:,1);
@@ -100,8 +145,29 @@ blueChannelOrig = originalImage(:,:,3);
 redChannelOrig(whitepixels)=255;
 greenChannelOrig(whitepixels)=0;
 blueChannelOrig(whitepixels)=0;
-originalImage = cat(3, redChannelOrig, greenChannelOrig, blueChannelOrig);
+
+%recombine color channels
+origImage = cat(3, redChannelOrig, greenChannelOrig, blueChannelOrig);
+
  
 %display images with red where edge detection program detected edges
-imshow(computerData);
-imshow(originalImage);
+%figure(1);
+%subplot(1, 1, 1);
+%imshow(compData);
+%imshow(origImage);
+end
+
+function funGif = blurTime(fileName)
+for jj = 0:0.01:0.5 %increments of blur
+    oimage = imread(strcat("blurred/",fileName,"blur",num2str(jj),".jpg"));
+    image = imread(strcat("blurred/",fileName,"blur",num2str(jj),"Detected",".jpg"));
+    [compData, origImage] = overlayImage(image, oimage);
+    
+    figure(1);hold all
+    subplot(1, 3, 1); imshow(oimage); title('Original Image'); %original image with increasing noise
+    subplot(1, 3, 2); imshow(image); title('Computer Sees'); %edge detection image 
+    subplot(1, 3, 3); imshow(compData); imshow(origImage); title('Overlay'); %Overlay image
+    pause(0.001);
+end
+end
+
