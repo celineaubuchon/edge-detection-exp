@@ -19,30 +19,35 @@
         sens = 0.4;
         combined = (imageDetected.^2 + imageDetected2.^2).^0.5 * sens;
         combined(combined > 1) = 1;
-        imshow(combined == 1);
+        %imshow(combined == 1);
         imwrite(combined == 1,strcat("images/",fileVec(ii),"Detected",".jpg"));
     end
     
-    %Range of Blurred images
-    if(true) %creating range of blurred images
-        for ii = 1:length(fileVec)
-            for jj = 0:0.01:0.5
-                %save original blurred image image
-                bimage = imnoise(image, 'gaussian', jj);
-                bimage = im2gray(image)/255.0;
-                imwrite(image,strcat("blurred/",fileVec(ii),"blur",num2str(jj),".jpg"));
-                
-                %image = imgaussfilt(image, 2); % works well with the clip art
-                imageDetected = convolve1D(bimage, [1 2 1], [1 0 -1]);
-                imageDetected2 = rot90(convolve1D(rot90(bimage), [1 2 1], [1 0 -1]), 3);
-                sens = 0.4;
-                combined = (imageDetected.^2 + imageDetected2.^2).^0.5 * sens;
-                combined(combined > 1) = 1;
-                %save(combined == 1);
-                imwrite(combined == 1,strcat("blurred/",fileVec(ii),"blur",num2str(jj),"Detected",".jpg"));
-            end
-        end
-    end
+    blurTime("sloth");
+    
+    
+    
+%     %Range of Blurred images
+%     if(true) %creating range of blurred images
+%         for ii = 1:length(fileVec)
+%             for jj = 0:0.01:0.5
+%                 %save original blurred image image
+%                 bimage = imnoise(image, 'gaussian', jj);
+%                 bimage = im2gray(image)/255.0;
+%                 imwrite(image,strcat("blurred/",fileVec(ii),"blur",num2str(jj),".jpg"));
+%                 
+%                 %image = imgaussfilt(image, 2); % works well with the clip art
+%                 imageDetected = convolve1D(bimage, [1 2 1], [1 0 -1]);
+%                 imageDetected2 = rot90(convolve1D(rot90(bimage), [1 2 1], [1 0 -1]), 3);
+%                 sens = 0.4;
+%                 combined = (imageDetected.^2 + imageDetected2.^2).^0.5 * sens;
+%                 combined(combined > 1) = 1;
+%                 %save(combined == 1);
+%                 imwrite(combined == 1,strcat("blurred/",fileVec(ii),"blur",num2str(jj),"Detected",".jpg"));
+%             end
+%         end
+%     end
+
 
 %% Functions
     % functions we will write to be called in main script
@@ -111,6 +116,26 @@ function edges = convolve1D(photo, kH, kV)
     end
     % sets the output to result2
     edges = result2;
+end
+
+function funGif = blurTime(photo)
+for jj = 0:0.01:0.5 %increments of blur
+	image = imnoise(photo, 'gaussian', jj);
+image = im2gray(image)/255.0;
+ 
+	oimage = image; %copy of original image for printing display
+	
+	%Computer Edge detection
+	imageDetected = convolve1D(image, [1 2 1], [1 0 -1]);
+	imageDetected2 = rot90(convolve1D(rot90(image), [1 2 1], [1 0 -1]), 3);
+	sens = 0.4;
+	combined = (imageDetected.^2 + imageDetected2.^2).^0.5 * sens;
+	combined(combined > 1) = 1;
+	
+    figure(1);hold all
+	subplot(1, 2, 1); imshow(oimage); title('Original Image'); %original image with increasing noise
+	subplot(1, 2, 2); imshow(combined == 1); title('Computer Sees'); %edge detection image
+end
 end
 
 
