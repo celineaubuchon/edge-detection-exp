@@ -5,6 +5,22 @@ Brainstorming--all group members, 1 hour
 Project Proposal--all group members, 1 hour
 
 To run the code in experiment.m, you must have Psychtoolbox-3 installed.
+
+Quick how-to-run:
+1)Go to edge_detection_new script
+2)Click "Run"
+3)Watch how computer edge detection weakens as photo noise increases
+4)Go to experiment script
+5)Click "Run"
+6)Enter your initials
+7)Image will appear with 2 red horizontal lines and a small vertical line between them. Use right and left arrows to navigate alone red road and press enter at every edge between section you discern.
+8)Once done with picture, press space bar to continue to next picture
+9)Do this for 9 total photos
+10)Go to analysis script
+11)Add name of your run to array**
+12)Click "Run"
+13)See new graph with your data included and observe difference between human and computer edge detection
+
 The scripts:
 
 edgedetection: Implement Sobel edge detection on 3 images of varying degrees of complexity (silhouette of MATLAB logo, clipart sloth face, and Professor Serre's profile picture) with 3 different amounts of Gaussian blur (0, 0.02, and 0.04).
