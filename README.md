@@ -10,6 +10,8 @@ Quick how-to-run:
 
 3)Watch how computer edge detection weakens as photo noise increases
 
+LINK GIF
+
 4)Go to experiment script
 
 5)Click "Run"
@@ -24,7 +26,7 @@ Quick how-to-run:
 
 10)Go to analysis script
 
-11)Add name of your run to array**
+11)Follow first comment: Change he file path o data/your data.txt....
 
 12)Click "Run"
 
